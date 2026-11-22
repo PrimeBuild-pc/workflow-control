@@ -1,0 +1,89 @@
+name: Verify and merge a pull request
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: Target repository
+        required: true
+        type: choice
+        options:
+          - LightCrosshair
+          - TweakHub
+          - ThreadPilot
+          - SockTuner
+          - ZapTweaks
+          - NeuroTune
+          - discord-theme-launcher
+      pull_request:
+        description: Open PR number
+        required: true
+        type: number
+      expected_head:
+        description: Full SHA of the reviewed PR head
+        required: true
+        type: string
+      expected_base:
+        description: Full SHA of the reviewed main
+        required: true
+        type: string
+      mode:
+        description: Verify without writes, or merge the verified PR
+        required: true
+        default: verify
+        type: choice
+        options: [verify, merge]
+      maintenance:
+        description: Match an explicitly pinned maintenance PR that changes workflow files
+        default: false
+        type: boolean
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: verified-merge-${{ inputs.repository }}
+  cancel-in-progress: false
+
+jobs:
+  review:
+    if: >-
+      github.repository == 'PrimeBuild-pc/workflow-control' && github.ref == 'refs/heads/main'
+      && github.actor_id == '162145141' && github.triggering_actor == github.repository_owner
+      && github.run_attempt == '1'
+    environment: merge-control
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - name: Verify the controller
+        run: node --test scripts/verification.test.mjs
+      - name: Get a token for only the chosen repository
+        id: token
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3
+        with:
+          client-id: ${{ vars.MERGE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.MERGE_APP_PRIVATE_KEY }}
+          owner: PrimeBuild-pc
+          repositories: ${{ inputs.repository }}
+          permission-contents: ${{ inputs.mode == 'merge' && 'write' || 'read' }}
+          permission-actions: read
+          permission-pull-requests: read
+      - name: Verify GitHub evidence and apply the selected operation
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TARGET_TOKEN: ${{ steps.token.outputs.token }}
+          MERGE_APP_ID: ${{ vars.MERGE_APP_ID }}
+          TARGET_REPOSITORY: ${{ inputs.repository }}
+          PULL_REQUEST: ${{ inputs.pull_request }}
+          EXPECTED_HEAD: ${{ inputs.expected_head }}
+          EXPECTED_BASE: ${{ inputs.expected_base }}
+          MODE: ${{ inputs.mode }}
+          MAINTENANCE: ${{ inputs.maintenance }}
+        run: node scripts/workflow.mjs
