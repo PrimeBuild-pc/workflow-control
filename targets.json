@@ -1,31 +1,5 @@
 {
-  "maintenance": {
-    "LightCrosshair": {
-      "number": 42,
-      "head": "1b63bcf2c11d9d7e59c7bebe96dcac2d5f9c2ef5",
-      "base": "ecef98843ce0aa55c4cada8b9b42f71bb12d06c7"
-    },
-    "TweakHub": {
-      "number": 44,
-      "head": "3a478ebb366a9876d0ba7f675f2c925bdf0864a8",
-      "base": "e9da5b4c1da632aa23c6268188cca720cf7b94d5"
-    },
-    "ThreadPilot": {
-      "number": 125,
-      "head": "4ec6e03b982bc9c8af516319081eb400ca453b98",
-      "base": "4c628a5a23bae4f7d1bc50053b5f76ae094e4805"
-    },
-    "SockTuner": {
-      "number": 61,
-      "head": "4026c61ed022bb6db90843069d0ebc07fdbcfc86",
-      "base": "2171ae4c52303bb6830c292b742f70dbaff8c509"
-    },
-    "ZapTweaks": {
-      "number": 19,
-      "head": "0b89f378e9defdb8c831e8539dfd6dd70e457166",
-      "base": "8b5a217df91e14698e90f54b16cb9ebc113dfb96"
-    }
-  },
+  "maintenance": {},
   "rulesets": {
     "LightCrosshair": 27840485,
     "TweakHub": 27840486,
