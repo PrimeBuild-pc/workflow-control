@@ -24,16 +24,6 @@
       "number": 19,
       "head": "0b89f378e9defdb8c831e8539dfd6dd70e457166",
       "base": "8b5a217df91e14698e90f54b16cb9ebc113dfb96"
-    },
-    "NeuroTune": {
-      "number": 22,
-      "head": "640e0da444ea5a864b269ceb289f8ecd49d5f909",
-      "base": "0f2e78413fbb4d2bd6d3e854fce4d3c4304611f4"
-    },
-    "discord-theme-launcher": {
-      "number": 10,
-      "head": "36eb4286db9035ecec2509357dae5eeff965c90c",
-      "base": "783c112c6481c5d761cf95e3ee4bb749abc04ab7"
     }
   },
   "rulesets": {}
