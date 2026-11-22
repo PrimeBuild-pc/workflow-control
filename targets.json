@@ -26,5 +26,13 @@
       "base": "8b5a217df91e14698e90f54b16cb9ebc113dfb96"
     }
   },
-  "rulesets": {}
+  "rulesets": {
+    "LightCrosshair": 27840485,
+    "TweakHub": 27840486,
+    "ThreadPilot": 27840487,
+    "SockTuner": 27840488,
+    "ZapTweaks": 27840490,
+    "NeuroTune": 27840491,
+    "discord-theme-launcher": 27840492
+  }
 }
