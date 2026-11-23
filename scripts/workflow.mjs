@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { appendFile, readFile } from 'node:fs/promises';
+import { appendFile, readFile, writeFile } from 'node:fs/promises';
 import { createClient, mergeVerified, owner, verifyPullRequest } from './verification.mjs';
 
 const env = process.env;
@@ -20,10 +20,27 @@ const request = createClient(env.TARGET_TOKEN);
 const verified = await verifyPullRequest(request, {
   repository: env.TARGET_REPOSITORY, number: env.PULL_REQUEST,
   head: env.EXPECTED_HEAD, base: env.EXPECTED_BASE, maintenance: env.MAINTENANCE === 'true',
+  releaseVersion: env.RELEASE_VERSION,
 }, setup.maintenance);
 const result = env.MODE === 'merge'
   ? await mergeVerified(request, verified, { rulesetId: setup.rulesets[verified.repository], appId: Number(env.MERGE_APP_ID) })
   : '';
+if (result && verified.release) {
+  const receipt = {
+    repository: `${owner}/${verified.repository}`,
+    pullRequest: Number(verified.number),
+    authorizer: env.GITHUB_ACTOR,
+    controllerRun: env.GITHUB_RUN_ID,
+    head: verified.head,
+    base: verified.base,
+    testedMerge: verified.merge,
+    testedTree: verified.tree,
+    ciRun: verified.run,
+    commit: result,
+    ...verified.release,
+  };
+  await writeFile(env.RELEASE_RECEIPT, JSON.stringify(receipt, null, 2) + '\n');
+}
 await appendFile(env.GITHUB_STEP_SUMMARY, [
   '### Verified pull request', '',
   `- Repository: ${owner}/${verified.repository}`,
@@ -34,5 +51,9 @@ await appendFile(env.GITHUB_STEP_SUMMARY, [
   `- Tested merge: ${verified.merge}`,
   `- CI run: ${verified.run}`,
   result ? `- Merged commit: ${result}` : '- Mode: verification only',
+  ...(verified.release ? [
+    `- Release version: ${verified.release.version} (${verified.release.type})`,
+    `- Approved channels: ${verified.release.channels.join(', ')}`,
+  ] : []),
   '',
 ].join('\n'));

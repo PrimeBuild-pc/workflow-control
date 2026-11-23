@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { verifyReleaseIntent } from './release-intent.mjs';
 
 export const owner = 'PrimeBuild-pc';
 const sha = /^[a-f0-9]{40}$/u;
@@ -34,7 +35,7 @@ export function createClient(token) {
   };
 }
 
-export async function verifyPullRequest(request, { repository, number, head, base, maintenance }, approvedMaintenance = {}) {
+export async function verifyPullRequest(request, { repository, number, head, base, maintenance, releaseVersion }, approvedMaintenance = {}) {
   assert.ok(Object.hasOwn(targets, repository), 'Repository is not in the rollout.');
   assert.match(number, /^[1-9][0-9]*$/u);
   assert.match(head, sha, 'Enter the full reviewed PR head SHA.');
@@ -79,6 +80,7 @@ export async function verifyPullRequest(request, { repository, number, head, bas
     assert.deepEqual(approvedMaintenance[repository], { number: Number(number), head, base },
       'The maintenance PR does not match the recorded approval.');
   }
+  const release = await verifyReleaseIntent(get, repository, files, merge.sha, releaseVersion);
 
   const review = await request('graphql', {
     method: 'POST',
@@ -115,7 +117,7 @@ export async function verifyPullRequest(request, { repository, number, head, bas
     'CI did not record the exact test merge for this attempt.');
   const latest = await snapshot();
   assert.equal(latest.merge_commit_sha, merge.sha, 'Test merge changed during verification.');
-  return { prefix, pull, repository, number, head, base, merge: merge.sha, tree: merge.tree.sha, run: run.id };
+  return { prefix, pull, repository, number, head, base, merge: merge.sha, tree: merge.tree.sha, run: run.id, release };
 }
 
 export async function mergeVerified(request, verified, { rulesetId, appId }) {

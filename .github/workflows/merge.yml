@@ -37,6 +37,10 @@ on:
         description: Match an explicitly pinned maintenance PR that changes workflow files
         default: false
         type: boolean
+      release_version:
+        description: Exact version from a changed release-intent.json, or blank for an ordinary PR
+        required: false
+        type: string
 
 permissions:
   actions: read
@@ -63,7 +67,7 @@ jobs:
         with:
           node-version: '24'
       - name: Verify the controller
-        run: node --test scripts/verification.test.mjs
+        run: node --test
       - name: Get a token for only the chosen repository
         id: token
         uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3
@@ -86,4 +90,14 @@ jobs:
           EXPECTED_BASE: ${{ inputs.expected_base }}
           MODE: ${{ inputs.mode }}
           MAINTENANCE: ${{ inputs.maintenance }}
+          RELEASE_VERSION: ${{ inputs.release_version }}
+          RELEASE_RECEIPT: ${{ runner.temp }}/release-approval.json
         run: node scripts/workflow.mjs
+      - name: Save the release approval
+        if: inputs.mode == 'merge' && inputs.release_version != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-approval
+          path: ${{ runner.temp }}/release-approval.json
+          if-no-files-found: error
+          retention-days: 90
