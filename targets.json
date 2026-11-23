@@ -1,5 +1,11 @@
 {
-  "maintenance": {},
+  "maintenance": {
+    "ThreadPilot": {
+      "number": 130,
+      "head": "881b5c22a468295d0b84145a8a53d3ba56c53473",
+      "base": "9b535c3c1a82be05d180ca9043ff552513a4535d"
+    }
+  },
   "rulesets": {
     "LightCrosshair": 27840485,
     "TweakHub": 27840486,
