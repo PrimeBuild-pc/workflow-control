@@ -1,11 +1,5 @@
 {
-  "maintenance": {
-    "TweakHub": {
-      "number": 48,
-      "head": "ca96edd9b51cf7b57daadf241af3d3cbea7d066b",
-      "base": "4886f079ae6cd80abd104bdeb20b1f9b98fc3f21"
-    }
-  },
+  "maintenance": {},
   "rulesets": {
     "LightCrosshair": 27840485,
     "TweakHub": 27840486,
